@@ -147,6 +147,12 @@ void  free_tree(Node *root);
 ## Requirements
 
 - C compiler: GCC (Linux / macOS / MinGW on Windows) or MSVC
-- `Dictionary.txt` in the working directory
+- > `Dictionary.txt` (one word per line) is not included in this repository. Place your own word list in the same directory as the executable.
 
 **Windows note:** the code uses `_stricmp` automatically on Windows via a compile-time macro — no changes needed.
+
+## Author
+Omar El-Banna, CCE, Alexandria University, Faculty of Engineering.
+
+## License
+Released under the MIT License. Developed as a course project for Data Structures (1), Faculty of Engineering, Alexandria University.
