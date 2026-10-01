@@ -89,7 +89,7 @@ echo 0 | ./dictionary     Dictionary_random.txt # Height = 21
 
 ```
 .
-├── dictionary.c     # Full source code (single file as required)
+├── dictionary.c             # AVL spell checker (main program)
 ├── bst_dictionary.c         # Plain BST version (no balancing), used as a comparison baseline
 ├── Dictionary.txt           # Word list, one word per line (166,817 lines, 163,933 unique ignoring case)
 ├── Dictionary_random.txt    # Same words in shuffled order (fixed seed)
