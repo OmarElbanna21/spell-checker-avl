@@ -1,43 +1,11 @@
 /*
- * BST Dictionary (AVL) - Spell Checker
- * =====================================
- * CSE127 - Data Structures (1) | Spring 2026
- * 
- * Name: [Omar Ehab Abdelmoneim Mahmoud El-Banna]
- * ID: [11172]
+ * Plain BST Dictionary - Spell Checker (comparison baseline)
+ * ==========================================================
+ * Same program as dictionary.c, but WITHOUT any balancing.
+ * It exists to compare tree height against the AVL version
+ * for different insertion orders (see README).
  *
- * OVERVIEW
- * --------
- * Loads an English dictionary (Dictionary.txt by default, or the file
- * given as the first argument) into an AVL Tree,
- * then checks user-entered sentences word by word.
- *
- * For each word:
- *   - Found     -> prints CORRECT
- *   - Not found -> prints 3 suggestions:
- *       A. Last node reached during search
- *       B. Inorder predecessor of A
- *       C. Inorder successor of A
- *
- * BONUS: Uses AVL Tree (self-balancing) instead of plain BST.
- *   - Guarantees O(log n) search and insert
- *   - With 163,933 unique words: Height = 20 (alphabetical list) or 21 (shuffled list)
- *     (plain BST: see bst_dictionary.c and the README comparison)
- *
- * DESIGN NOTES
- * ------------
- * - Search is iterative (no recursion) => more efficient and avoids stack overflow
- * - strcasecmp / _stricmp used for case-insensitive comparison
- * - Leading and trailing punctuation stripped before lookup
- * - Enter 0 on a blank line to exit
- * - 0 inside a sentence treated as a regular (misspelled) word, not as an exit command
- * 
- * =================
- *  SUBMISSION NOTE
- * =================
- * Submitting source code only (.c) as per requirements.
- * The DESIGN NOTES section above serves as inline documentation
- * in case there is no discussion to elaborate further.
+ * Usage: ./bst_dictionary [wordlist]     (default: Dictionary.txt)
  */
 
 
@@ -55,27 +23,13 @@
 
 typedef struct Node {
     char word[MAX_WORD];
-    int height;
     struct Node *left, *right;
 } Node;
 
-/* ── AVL helpers ── */
-
-static int node_height(Node *n) {
-    return n ? n->height : 0;
-}
+/* ── BST helpers ── */
 
 static int max2(int a, int b) {
     return a > b ? a : b;
-}
-
-static void update_height(Node *n) {
-    if (n)
-        n->height = 1 + max2(node_height(n->left), node_height(n->right));
-}
-
-static int balance_factor(Node *n) {
-    return n ? node_height(n->left) - node_height(n->right) : 0;
 }
 
 static Node *new_node(const char *word) {
@@ -86,46 +40,13 @@ static Node *new_node(const char *word) {
     }
     strncpy(n->word, word, MAX_WORD - 1);
     n->word[MAX_WORD - 1] = '\0';
-    n->height = 1;
     n->left = n->right = NULL;
     return n;
 }
 
-static Node *rotate_right(Node *y) {
-    Node *x  = y->left;
-    Node *T2 = x->right;
-    x->right = y;
-    y->left  = T2;
-    update_height(y);
-    update_height(x);
-    return x;
-}
-
-static Node *rotate_left(Node *x) {
-    Node *y  = x->right;
-    Node *T2 = y->left;
-    y->left  = x;
-    x->right = T2;
-    update_height(x);
-    update_height(y);
-    return y;
-}
-
-static Node *rebalance(Node *n) {
-    update_height(n);
-    int bf = balance_factor(n);
-
-    if (bf > 1) {
-        if (balance_factor(n->left) < 0)
-            n->left = rotate_left(n->left);
-        return rotate_right(n);
-    }
-    if (bf < -1) {
-        if (balance_factor(n->right) > 0)
-            n->right = rotate_right(n->right);
-        return rotate_left(n);
-    }
-    return n;
+/* Height of the tree (recursive; nodes do not store their height here) */
+static int tree_height(Node *n) {
+    return n ? 1 + max2(tree_height(n->left), tree_height(n->right)) : 0;
 }
 
 /* ── Core operations ── */
@@ -136,7 +57,7 @@ Node *insert(Node *root, const char *word) {
     if      (cmp < 0) root->left  = insert(root->left,  word);
     else if (cmp > 0) root->right = insert(root->right, word);
     else              return root;   /* duplicate – ignore */
-    return rebalance(root);
+    return root;
 }
 
 /* Returns found node (or NULL), sets *last to last visited node */
@@ -229,7 +150,7 @@ int main(int argc, char *argv[]) {
     printf(".........................\n");
     printf("Size = %d\n", tree_size(root));
     printf(".........................\n");
-    printf("Height = %d\n", node_height(root));
+    printf("Height = %d\n", tree_height(root));
     printf(".........................\n");
 
     char line[1024];
